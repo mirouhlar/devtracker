@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %} 
+
+{% block title %}My Dashboard - Roadmap.dev{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">My Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'project_create' %}" class="btn btn-sm btn-outline-primary">+ New Project</a>
+            <a href="{% url 'log_create' %}" class="btn btn-sm btn-outline-info">+ New Log</a>
+            <a href="{% url 'goal_create' %}" class="btn btn-sm btn-outline-success">+ New Goal</a>
+        </div>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<p class="lead">Hello, {{ user.username }}! Here's an overview of your activities.</p>
+{% endif %}
+
+<div class="card mb-4 shadow-sm">
+    <div class="card-header">
+        <h4 class="my-0 fw-normal">📊 Progress Overview</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <p class="card-text"><strong>Projects:</strong> <span class="badge bg-primary rounded-pill">{{ project_count }}</span></p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <p class="card-text"><strong>Dev Logs:</strong> <span class="badge bg-info rounded-pill">{{ log_count }}</span></p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <p class="card-text"><strong>Goals Completed:</strong> <span class="badge bg-success rounded-pill">{{ goal_completed }} / {{ goal_total }}</span></p>
+            </div>
+        </div>
+        {% if goal_total > 0 %}
+            <div class="progress" style="height: 25px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {% widthratio goal_completed goal_total 100 %}%;" aria-valuenow="{{ goal_completed }}" aria-valuemin="0" aria-valuemax="{{ goal_total }}">
+                    {% widthratio goal_completed goal_total 100 %}%
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted mt-2">No goals set yet. Set some goals to track your progress!</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="my-0 fw-normal">🚀 My Projects</h4>
+                <a href="{% url 'project_create' %}" class="btn btn-primary btn-sm">+ New Project</a>
+            </div>
+            <div class="card-body">
+                {% if projects %}
+                <ul class="list-group list-group-flush">
+                    {% for project in projects %}
+                        <li class="list-group-item">
+                            <strong>{{ project.title }}</strong>
+                            <p class="small text-muted mb-1">{{ project.description|truncatewords:15 }}</p>
+                            <small class="d-block">
+                                Contributors:
+                                {% if project.contributors.all|length > 0 %}
+                                    {% for usr in project.contributors.all %}
+                                        {% if usr != project.owner %}
+                                            <span class="badge bg-secondary me-1">{{ usr.username }}</span>
+                                        {% endif %}
+                                    {% empty %}
+                                        <span class="text-muted">None</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted">None</span>
+                                {% endif %}
+                            </small>
+                            <div class="mt-2">
+                                {% if project.owner == request.user %}
+                                    <a href="{% url 'project_edit' project.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                    <a href="{% url 'project_delete' project.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                                {% elif request.user in project.contributors.all %}
+                                    <a href="{% url 'project_edit' project.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                {% endif %}
+                                 <a href="{% url 'project_detail' project.pk %}" class="btn btn-outline-info btn-sm">View Details</a> 
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No projects yet. Click "+ New Project" to get started!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="my-0 fw-normal">📝 My Dev Logs</h4>
+                <a href="{% url 'log_create' %}" class="btn btn-info btn-sm text-white">+ New Log</a>
+            </div>
+            <div class="card-body">
+                {% if logs %}
+                <ul class="list-group list-group-flush">
+                    {% for log in logs %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ log.title }}</strong>
+                                <span class="text-muted"> ({{ log.project.title }})</span>
+                                <small class="d-block text-muted">{{ log.created_at|date:"M d, Y, h:i A" }}</small>
+                            </div>
+                            <div>
+                                <a href="{% url 'log_edit' log.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                                <a href="{% url 'log_delete' log.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No dev logs yet. Add a log to document your progress!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4 class="my-0 fw-normal">🎯 My Goals</h4>
+        <a href="{% url 'goal_create' %}" class="btn btn-success btn-sm">+ New Goal</a>
+    </div>
+    <div class="card-body">
+        {% if goals %}
+        <ul class="list-group list-group-flush">
+            {% for goal in goals %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong class="{{ goal.is_completed|yesno:'text-decoration-line-through text-muted,' }}">{{ goal.title }}</strong>
+                        <span class="badge {% if goal.is_completed %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                            {% if goal.is_completed %}✅ Done{% else %}⏳ Pending{% endif %}
+                        </span>
+                         {% if goal.project %}<small class="text-muted"> (Project: {{ goal.project.title }})</small>{% endif %}
+                    </div>
+                    <div>
+                        <a href="{% url 'goal_edit' goal.pk %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+                        <a href="{% url 'goal_delete' goal.pk %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-muted">No goals set. Create some goals to stay motivated!</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

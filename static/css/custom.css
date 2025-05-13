@@ -1,0 +1,37 @@
+body {
+    padding-top: 56px; /* Adjust if navbar height changes */
+    background-color: #f8f9fa; /* Light grey background for a softer look */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Example of a modern font stack */
+}
+
+.navbar-dark .navbar-brand {
+    font-weight: bold;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+main.container { /* Target the main content container more specifically if needed */
+    background-color: #ffffff; /* White background for content area */
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 20px rgba(0,0,0,.08);
+    margin-top: 2rem !important; /* Ensure spacing from fixed navbar */
+}
+
+.card {
+    border: none; /* Remove default card borders for a cleaner look with shadows */
+}
+
+.card-header {
+    font-weight: 500;
+}
+
+.btn-primary {
+    /* Example: customize primary button color */
+    background-color: #0056b3; 
+     border-color: #0056b3;
+}
+
+/* Add more custom styles as needed */

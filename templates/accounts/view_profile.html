@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h2 class="mb-0">{{ profile_user.username }}'s Profile</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3 text-center">
+                    {% if profile_user.profile_picture %}
+                        <img src="{{ profile_user.profile_picture.url }}" alt="Profile Picture" class="shadow" style="max-width: 150px; height: 150px; object-fit: cover;">
+                    {% else %}
+                        <p class="text-muted"><em>No profile picture uploaded.</em></p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <strong class="form-label">Bio:</strong>
+                    <p>{{ profile_user.bio|linebreaks|default:"Not provided." }}</p>
+                </div>
+
+                {% if profile_user.github %}
+                    <div class="mb-3">
+                        <strong class="form-label"><i class="fab fa-github me-1"></i> GitHub:</strong>
+                        <p><a href="{{ profile_user.github }}" target="_blank" rel="noopener noreferrer">{{ profile_user.github }}</a></p>
+                    </div>
+                {% endif %}
+
+                {% if profile_user.linkedin %}
+                    <div class="mb-3">
+                        <strong class="form-label"><i class="fab fa-linkedin me-1"></i> LinkedIn:</strong>
+                        <p><a href="{{ profile_user.linkedin }}" target="_blank" rel="noopener noreferrer">{{ profile_user.linkedin }}</a></p>
+                    </div>
+                {% endif %}
+
+                {% if profile_user.website %}
+                    <div class="mb-3">
+                        <strong class="form-label"><i class="fas fa-link me-1"></i> Website:</strong>
+                        <p><a href="{{ profile_user.website }}" target="_blank" rel="noopener noreferrer">{{ profile_user.website }}</a></p>
+                    </div>
+                {% endif %}
+
+                {% if profile_user.location %}
+                    <div class="mb-3">
+                        <strong class="form-label"><i class="fas fa-map-marker-alt me-1"></i> Location:</strong>
+                        <p>{{ profile_user.location|default:"Not provided." }}</p>
+                    </div>
+                {% endif %}
+
+                {% if request.user == profile_user %}
+                    <a href="{% url 'edit_profile' %}" class="btn btn-primary mt-3">
+                        <i class="fas fa-edit me-1"></i> Edit Profile
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

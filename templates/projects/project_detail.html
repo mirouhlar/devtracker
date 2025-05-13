@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %} 
+
+{% block title %}{{ project.title }} - Project Details{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8"> 
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light border-bottom">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h2 mb-0">{{ project.title }}</h1>
+                    <div>
+                        {% if request.user == project.owner or request.user in project.contributors.all %}
+                            <a href="{% url 'project_edit' project.pk %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit me-1"></i> Edit
+                            </a>
+                        {% endif %}
+                        {% if request.user == project.owner %}
+                            <a href="{% url 'project_delete' project.pk %}" class="btn btn-outline-danger btn-sm ms-2">
+                                <i class="fas fa-trash-alt me-1"></i> Delete
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 class="card-subtitle mb-2 text-muted">Owned by: {{ project.owner.username }}</h5>
+                
+                <p class="card-text mt-3"><strong>Description:</strong></p>
+                <div class="bg-light p-3 rounded mb-3">
+                    {{ project.description|linebreaksbr }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-2"><strong><i class="fab fa-github me-1"></i> GitHub Link:</strong></p>
+                        {% if project.github_link %}
+                            <a href="{{ project.github_link }}" target="_blank" class="btn btn-outline-dark btn-sm mb-3">{{ project.github_link }}</a>
+                        {% else %}
+                            <p><span class="text-muted">No GitHub link provided.</span></p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2"><strong><i class="fas fa-tags me-1"></i> Tags:</strong></p>
+                        {% if project.tags %}
+                            <span class="badge bg-info text-dark me-1 mb-1">{{ project.tags }}</span>
+                        {% else %}
+                            <p><span class="text-muted">No tags specified.</span></p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5 class="mt-4"><i class="fas fa-users me-1"></i> Contributors:</h5>
+                <strong class="form-label"><i class="fas fa-users me-1"></i> Contributors:</strong>
+                {% if project.contributors.all|length > 1 or project.owner %}
+                    <ul class="list-inline">
+                        {% if project.owner %}
+                            <li class="list-inline-item">
+                                <span class="badge bg-success"><i class="fas fa-crown me-1"></i> {{ project.owner.username }} (Owner)</span>
+                            </li>
+                        {% endif %}
+                        {% for user in project.contributors.all %}
+                            {% if user != project.owner %}
+                                <li class="list-inline-item">
+                                    <span class="badge bg-secondary">{{ user.username }}</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No other contributors besides the owner.</p>
+                {% endif %}
+            </div>
+            <div class="card-footer text-muted">
+                Created: {{ project.created_at|date:"F d, Y, P" }} | Last Updated: {{ project.updated_at|date:"F d, Y, P" }}
+            </div>
+        </div>
+
+        
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h4 class="my-0 fw-normal">📝 Related Dev Logs</h4>
+            </div>
+            <div class="card-body">
+                {% if project.logs.all %}  
+                <ul class="list-group list-group-flush">
+                    {% for log in project.logs.all %}
+                        <li class="list-group-item">
+                            <strong>{{ log.title }}</strong> - <small>{{ log.created_at|date:"M d, Y" }}</small> - <small><i>Author:</i> {{ log.author.username }}</small>
+                            <p>{{ log.content|truncatewords:20 }}</p>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">No development logs associated with this project yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+
+        <div class="text-center mt-4">
+            <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary"><i class="fas fa-arrow-left me-1"></i> Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
