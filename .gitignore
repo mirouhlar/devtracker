@@ -67,6 +67,9 @@ db.sqlite3-journal
 # Uncomment below if you don't want to track migrations at all (not recommended for teams)
 **/migrations/
 
+# Collected static files (by collectstatic)
+staticfiles/
+
 # Flask stuff:
 instance/
 .webassets-cache
